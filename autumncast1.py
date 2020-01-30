@@ -196,6 +196,24 @@ start_day = pd.to_datetime(start_date, format = '%j').day
 end_month = pd.to_datetime(end_date, format = '%j').month
 end_day = pd.to_datetime(end_date, format = '%j').day
 
-
 st.write('The best fall color in', user_input, ' will be between:')
 st.write(calendar.month_name[start_month], start_day, 2020, 'and', calendar.month_name[end_month], end_day, 2020)
+
+
+# ##################################################################
+ # Adding code so we can have map default to the center of the data
+midpoint = (np.average(map_data['lat']), np.average(map_data['lon']))
+st.deck_gl_chart(
+            viewport={
+                'latitude': midpoint[0],
+                'longitude':  midpoint[1],
+                'zoom': 5
+            },
+            layers=[{
+                'type': 'ScatterplotLayer',
+                'data': map_data,
+                'radiusScale': 1,
+   'radiusMinPixels': 4,
+                'getFillColor': [248, 24, 148],
+            }]
+        )
