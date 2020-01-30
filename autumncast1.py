@@ -197,5 +197,5 @@ end_month = pd.to_datetime(end_date, format = '%j').month
 end_day = pd.to_datetime(end_date, format = '%j').day
 
 
-st.write('The best fall color will be between:')
+st.write('The best fall color in', user_input, ' will be between:')
 st.write(calendar.month_name[start_month], start_day, 2020, 'and', calendar.month_name[end_month], end_day, 2020)
