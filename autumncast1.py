@@ -187,8 +187,8 @@ model_in = [values[1], values[2], values[3], values[4], values[5], values[6], va
 #st.write(model_in)
 
 prediction = pickle_model.predict(np.array(model_in).reshape(1,-1))[0]
-start_date = prediction - 5
-end_date = prediction + 5
+start_date = prediction - 7
+end_date = prediction + 7
 
 start_month = pd.to_datetime(start_date, format = '%j').month
 start_day = pd.to_datetime(start_date, format = '%j').day
