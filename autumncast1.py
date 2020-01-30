@@ -202,6 +202,11 @@ st.write(calendar.month_name[start_month], start_day, 2020, 'and', calendar.mont
 
 # ##################################################################
  # Adding code so we can have map default to the center of the data
+
+#Map the input location
+map_data = pd.DataFrame(columns=['lat', 'lon'])
+map_data.loc[0] = [location.latitude, location.longitude]
+
 midpoint = (np.average(map_data['lat']), np.average(map_data['lon']))
 st.deck_gl_chart(
             viewport={
