@@ -8,28 +8,46 @@ from datetime import date
 import calendar
 import rasterio
 
-
-st.title('Autumcast Version 1')
-
-user_input = st.text_input("Which location do you want to search? Enter a location like 'Burlington, Vermont'", "Burlington, VT")
-#st.write(user_input)
-geolocator = Nominatim(user_agent="my-application")
-try:
-    location = geolocator.geocode(user_input)
-    #print(loc.raw)
-    print('Coordinates: ', location.latitude, location.longitude)
-    st.write("Found: ", location)
-except:
-    st.write("Couldn't find this location. Try a different town name?")
-    location = geolocator.geocode('Burlington, Vermont')
-x = location.longitude
-y = location.latitude
+########################################################################
+# Read in useful functions
+#######################################################################
+#daylength function from: https://gist.github.com/anttilipp/ed3ab35258c7636d87de6499475301ce
+def daylength(dayOfYear, lat):
+    """Computes the length of the day (the time between sunrise and
+    sunset) given the day of the year and latitude of the location.
+    Function uses the Brock model for the computations.
+    For more information see, for example,
+    Forsythe et al., "A model comparison for daylength as a
+    function of latitude and day of year", Ecological Modelling,
+    1995.
+    Parameters
+    ----------
+    dayOfYear : int
+        The day of the year. 1 corresponds to 1st of January
+        and 365 to 31st December (on a non-leap year).
+    lat : float
+        Latitude of the location in degrees. Positive values
+        for north and negative for south.
+    Returns
+    -------
+    d : float
+        Daylength in hours.
+    """
+    latInRad = np.deg2rad(lat)
+    declinationOfEarth = 23.45*np.sin(np.deg2rad(360.0*(283.0+dayOfYear)/365.0))
+    if -np.tan(latInRad) * np.tan(np.deg2rad(declinationOfEarth)) <= -1.0:
+        return 24.0
+    elif -np.tan(latInRad) * np.tan(np.deg2rad(declinationOfEarth)) >= 1.0:
+        return 0.0
+    else:
+        hourAngle = np.rad2deg(np.arccos(-np.tan(latInRad) * np.tan(np.deg2rad(declinationOfEarth))))
+        return 2.0*hourAngle/15.0
 
 def foliage_prediction_2020(x, y):
     tmin = []
     tmax = []
     ppt = []
-    year = '2020'
+    year = 2020
 #    st.write('predicting for: ', x, y, 'in ', year)
     if calendar.isleap(year):
         day_of_year = 366
@@ -39,20 +57,23 @@ def foliage_prediction_2020(x, y):
         Fdays = 28
 
     #pull data for that location, that year
-    with rasterio.open("/Users/elizabethspriggs/Insight/Foliage/Datasheets/stacked_PRISM/tmin_{}.bil".format(year)) as raster:
+    with rasterio.open("tasmin_day_CCSM4_rcp85_r6i1p1_20200101-20201231_clipped.tif") as raster:
         for val in raster.sample([(x, y)], indexes = range(1,day_of_year+1)): tmin.append(val)
 
     #pull data for that location, that year
-    with rasterio.open("/Users/elizabethspriggs/Insight/Foliage/Datasheets/stacked_PRISM/tmax_{}.bil".format(year)) as raster:
+    with rasterio.open("tasmax_day_CCSM4_rcp85_r6i1p1_20200101-20201231_clipped.tif") as raster:
         for val in raster.sample([(x, y)], indexes = range(1,day_of_year+1)): tmax.append(val)
 
     #pull data for that location, that year
-    with rasterio.open("pr_day_CCSM4_rcp85_r6i1p1_20200101-20201231_clipped.tif".format(year)) as raster:
+    with rasterio.open("pr_day_CCSM4_rcp85_r6i1p1_20200101-20201231_clipped.tif") as raster:
         for val in raster.sample([(x, y)], indexes = range(1,day_of_year+1)): ppt.append(val)
 
     #Get the day of the first frost:
     below_zero = np.where(tmin[0] < 0)
-    first_frost = below_zero[0][below_zero[0] > 200][0]
+    try:
+        first_frost = below_zero[0][below_zero[0] > 200][0]
+    except:
+        first_frost = day_of_year
     var1 = first_frost
 
     #Get the day of the fifth frost:
@@ -110,4 +131,23 @@ def foliage_prediction_2020(x, y):
     var10 = daylength(day, y)
 
     return(var1, var2, var3, var4, var5, var6, var7, var8, var9, var10)
-st.write(foliage_prediction_2020(x, y, '2020'))
+
+
+
+st.title('Autumcast Version 1')
+
+user_input = st.text_input("Which location do you want to search? Enter a location like 'Burlington, Vermont'", "Burlington, VT")
+#st.write(user_input)
+geolocator = Nominatim(user_agent="my-application")
+try:
+    location = geolocator.geocode(user_input)
+    #print(loc.raw)
+    print('Coordinates: ', location.latitude, location.longitude)
+    st.write("Found: ", location)
+except:
+    st.write("Couldn't find this location. Try a different town name?")
+    location = geolocator.geocode('Burlington, Vermont')
+x = location.longitude
+y = location.latitude
+
+st.write(foliage_prediction_2020(x, y))
