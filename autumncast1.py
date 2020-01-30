@@ -7,6 +7,8 @@ from datetime import datetime
 from datetime import date
 import calendar
 import rasterio
+import requests
+import urllib
 
 ########################################################################
 # Read in useful functions
@@ -43,6 +45,7 @@ def daylength(dayOfYear, lat):
         hourAngle = np.rad2deg(np.arccos(-np.tan(latInRad) * np.tan(np.deg2rad(declinationOfEarth))))
         return 2.0*hourAngle/15.0
 
+#feature engineering required for user input locations:
 def foliage_prediction_2020(x, y):
     tmin = []
     tmax = []
@@ -133,6 +136,9 @@ def foliage_prediction_2020(x, y):
     return(var1, var2, var3, var4, var5, var6, var7, var8, var9, var10)
 
 
+########################################################################
+# The actual app part
+#######################################################################
 
 st.title('Autumcast Version 1')
 
@@ -149,5 +155,24 @@ except:
     location = geolocator.geocode('Burlington, Vermont')
 x = location.longitude
 y = location.latitude
+
+#get the county FIP code for that location:
+
+#Encode parameters
+params = urllib.parse.urlencode({'latitude': y, 'longitude':x, 'format':'json'})
+#Contruct request URL
+url = 'https://geo.fcc.gov/api/census/block/find?' + params
+
+#Get response from API
+response = requests.get(url)
+
+#Parse json in response
+data = response.json()
+#Get FIPS code, print dominant species
+fips = data['County']['FIPS']
+deciduous_single = pd.read_csv('Single_deciduous_county.csv')
+tree = deciduous_single[deciduous_single.COUNTYFIP == int(fips)].Dominant_Species
+
+st.write('The dominant deciduous tree species near ',user_input ,' is ', tree.to_string(index = False), '.', sep='')
 
 st.write(foliage_prediction_2020(x, y))

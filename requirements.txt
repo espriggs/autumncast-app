@@ -6,3 +6,5 @@ geopy
 datetime
 rasterio
 sklearn
+requests
+urllib
