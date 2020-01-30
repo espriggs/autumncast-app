@@ -61,15 +61,15 @@ def foliage_prediction_2020(x, y):
 
     #pull data for that location, that year
     with rasterio.open("tasmin_day_CCSM4_rcp85_r6i1p1_20200101-20201231_clipped.tif") as raster:
-        for val in raster.sample([(x, y)], indexes = range(1,day_of_year+1)): tmin.append(val)
+        for val in raster.sample([(x, y)], indexes = range(1,day_of_year+1)): tmin.append(val-273.15)
 
     #pull data for that location, that year
     with rasterio.open("tasmax_day_CCSM4_rcp85_r6i1p1_20200101-20201231_clipped.tif") as raster:
-        for val in raster.sample([(x, y)], indexes = range(1,day_of_year+1)): tmax.append(val)
+        for val in raster.sample([(x, y)], indexes = range(1,day_of_year+1)): tmax.append(val-273.15)
 
     #pull data for that location, that year
     with rasterio.open("pr_day_CCSM4_rcp85_r6i1p1_20200101-20201231_clipped.tif") as raster:
-        for val in raster.sample([(x, y)], indexes = range(1,day_of_year+1)): ppt.append(val)
+        for val in raster.sample([(x, y)], indexes = range(1,day_of_year+1)): ppt.append(val*24*60*60)
 
     #Get the day of the first frost:
     below_zero = np.where(tmin[0] < 0)
@@ -181,10 +181,12 @@ with open(pkl_filename, 'rb') as file:
 
 values = foliage_prediction_2020(x, y)
 
-#st.write(values)
+st.write(values)
 
 model_in = [values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[9], '0', '0', '0', '0', '0']
 #st.write(model_in)
+
+#model_in = [366, 284.3, 277.5, 270.2, 302.8, .0002, .0003, 13, 10, '0', '0', '0', '0', '0']
 
 prediction = pickle_model.predict(np.array(model_in).reshape(1,-1))[0]
 start_date = prediction - 7
