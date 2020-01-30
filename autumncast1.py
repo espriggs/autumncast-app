@@ -10,7 +10,6 @@ import rasterio
 
 
 st.title('Autumcast Version 1')
-st.write('test update')
 
 user_input = st.text_input("Which location do you want to search? Enter a location like 'Burlington, Vermont'", "Burlington, VT")
 #st.write(user_input)
