@@ -181,7 +181,7 @@ with open(pkl_filename, 'rb') as file:
 
 values = foliage_prediction_2020(x, y)
 
-st.write(values)
+#st.write(values)
 
 model_in = [values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[9], '0', '0', '0', '0', '0']
 #st.write(model_in)
