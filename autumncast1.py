@@ -140,7 +140,7 @@ def foliage_prediction_2020(x, y):
 # The actual app part
 #######################################################################
 
-st.title('Autumcast Version 1')
+st.title('Autumcast')
 
 user_input = st.text_input("Which location do you want to search? Enter a location like 'Burlington, Vermont'", "Burlington, VT")
 #st.write(user_input)
@@ -175,4 +175,27 @@ tree = deciduous_single[deciduous_single.COUNTYFIP == int(fips)].Dominant_Specie
 
 st.write('The dominant deciduous tree species near ',user_input ,' is ', tree.to_string(index = False), '.', sep='')
 
-st.write(foliage_prediction_2020(x, y))
+pkl_filename = 'rf_2020_model.pkl'
+with open(pkl_filename, 'rb') as file:
+    pickle_model = pickle.load(file)
+
+values = foliage_prediction_2020(x, y)
+
+#st.write(values)
+
+model_in = [values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[9], '0', '0', '0', '0', '0']
+#st.write(model_in)
+
+prediction = pickle_model.predict(np.array(model_in).reshape(1,-1))[0]
+start_date = prediction - 5
+end_date = prediction + 5
+
+start_month = pd.to_datetime(start_date, format = '%j').month
+start_day = pd.to_datetime(start_date, format = '%j').day
+
+end_month = pd.to_datetime(end_date, format = '%j').month
+end_day = pd.to_datetime(end_date, format = '%j').day
+
+
+st.write('The best fall color will be between:')
+st.write(calendar.month_name[start_month], start_day, 2020, 'and', calendar.month_name[end_month], end_day, 2020)
