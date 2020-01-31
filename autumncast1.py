@@ -150,12 +150,14 @@ try:
     #print(loc.raw)
     print('Coordinates: ', location.latitude, location.longitude)
     st.write("Found: ", location)
+    x = location.longitude
+    y = location.latitude
+
 except:
     st.write("Couldn't find this location. Try a different town name?")
-    location = geolocator.geocode('Burlington, Vermont')
-x = location.longitude
-y = location.latitude
-
+#    location = geolocator.geocode('Burlington, Vermont')
+    y = 44.483752
+    x = -73.208798
 #get the county FIP code for that location:
 
 #Encode parameters
