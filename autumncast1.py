@@ -173,9 +173,12 @@ data = response.json()
 #Get FIPS code, print dominant species
 fips = data['County']['FIPS']
 deciduous_single = pd.read_csv('Single_deciduous_county.csv')
-tree = deciduous_single[deciduous_single.COUNTYFIP == int(fips)].Dominant_Species
 
-st.write('The dominant deciduous tree species near ',user_input ,' is ', tree.to_string(index = False), '.', sep='')
+#not all of the counties have FIA plots
+if any(deciduous_single.COUNTYFIP.astype(str).str.contains(fips)):
+    tree = deciduous_single[deciduous_single.COUNTYFIP == int(fips)].Dominant_Species
+    st.write('The dominant deciduous tree species near ',user_input ,' is ', tree.to_string(index = False), '.', sep='')
+
 
 pkl_filename = 'rf_2020_model.pkl'
 with open(pkl_filename, 'rb') as file:
