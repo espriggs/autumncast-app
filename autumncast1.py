@@ -140,7 +140,7 @@ def foliage_prediction_2020(x, y):
 # The actual app part
 #######################################################################
 
-st.title('Autumcast')
+st.title('Autumncast')
 
 user_input = st.text_input("Which location do you want to search? Enter a location like 'Burlington, Vermont'", "Burlington, VT")
 #st.write(user_input)
