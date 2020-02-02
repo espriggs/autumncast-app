@@ -9,6 +9,10 @@ import calendar
 import rasterio
 import requests
 import urllib
+import geopandas as gpd
+import shapefile as shp
+import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 
 ########################################################################
 # Read in useful functions
@@ -208,24 +212,34 @@ st.write(calendar.month_name[start_month], start_day, 2020, 'and', calendar.mont
 
 
 # ##################################################################
- # Adding code so we can have map default to the center of the data
+## Plot a heatmap
 
-#Map the input location
-map_data = pd.DataFrame(columns=['lat', 'lon'])
-map_data.loc[0] = [location.latitude, location.longitude]
+User_input_day = st.slider('Day of the year', 200, 365, int(prediction))
+st.write(User_input_day, 'is ', calendar.month_name[pd.to_datetime(User_input_day, format = '%j').month], pd.to_datetime(User_input_day, format = '%j').day, '2020')
+NE3 = gpd.read_file('NE3.shp')
+NE3.head()
 
-midpoint = (np.average(map_data['lat']), np.average(map_data['lon']))
-st.deck_gl_chart(
-            viewport={
-                'latitude': midpoint[0],
-                'longitude':  midpoint[1],
-                'zoom': 5
-            },
-            layers=[{
-                'type': 'ScatterplotLayer',
-                'data': map_data,
-                'radiusScale': 1,
-   'radiusMinPixels': 4,
-                'getFillColor': [248, 24, 148],
-            }]
-        )
+#create a custom color list that varies based on the user input:
+colors_list = np.repeat('lightgrey', 9, axis = 0)
+dates = [270, 275, 280, 285, 290, 295, 300, 305, 310]
+i = 0
+for date in dates:
+   # print(User_input_day-date)
+    if (User_input_day-date <= 14) & (User_input_day-date >= 7):
+        colors_list[i] = 'darkred'
+    if (User_input_day-date <= 7) & (User_input_day-date >= -7):
+        colors_list[i] = 'red'
+    if (User_input_day-date >= -14) & (User_input_day-date <= -7):
+        colors_list[i] = 'orange'
+    if (User_input_day-date >= -21) & (User_input_day-date <= -14):
+        colors_list[i] = 'goldenrod'
+    i +=1
+
+#color_list = ['darkred','darkred','darkred','red','red','red','orange','orange','lightgrey']
+colormap = []
+colormap = LinearSegmentedColormap.from_list([270, 275, 280, 285, 290, 295, 300, 305, 310],colors_list)
+colormap
+#NE2.plot(colors, cmap = colormap)
+NE3.plot(column = 'predicted', cmap = colormap)
+#predicted_day
+st.pyplot()

@@ -7,4 +7,5 @@ datetime
 rasterio
 sklearn
 requests
-
+geopandas
+shapefile
