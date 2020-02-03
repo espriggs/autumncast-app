@@ -13,7 +13,9 @@ import geopandas as gpd
 import shapefile as shp
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
-
+from matplotlib.patches import Patch
+from shapely.geometry import Point
+from matplotlib.lines import Line2D
 ########################################################################
 # Read in useful functions
 #######################################################################
@@ -146,14 +148,21 @@ def foliage_prediction_2020(x, y):
 
 st.title('Autumncast')
 
-user_input = st.text_input("Which location do you want to search? Enter a location like 'Burlington, Vermont'", "Burlington, VT")
+#st.write('')
+select = st.selectbox('Select a location:', ['Providence, RI',
+'Boston, MA', 'Northhampton, MA', 'Baxter, Maine', 'Burlington, VT', 'Hanover, NH'])
+
+user_input = st.text_input("Or try searching one here:", "")
+if user_input == '':
+    user_input = select
 #st.write(user_input)
+
 geolocator = Nominatim(user_agent="my-application")
 try:
     location = geolocator.geocode(user_input)
     #print(loc.raw)
     print('Coordinates: ', location.latitude, location.longitude)
-    st.write("Found: ", location)
+    #st.write("Found: ", location)
     x = location.longitude
     y = location.latitude
 
@@ -163,6 +172,8 @@ except:
     y = 44.483752
     x = -73.208798
 #get the county FIP code for that location:
+
+
 
 #Encode parameters
 params = urllib.parse.urlencode({'latitude': y, 'longitude':x, 'format':'json'})
@@ -238,8 +249,28 @@ for date in dates:
 #color_list = ['darkred','darkred','darkred','red','red','red','orange','orange','lightgrey']
 colormap = []
 colormap = LinearSegmentedColormap.from_list([270, 275, 280, 285, 290, 295, 300, 305, 310],colors_list)
-colormap
+#colormap
 #NE2.plot(colors, cmap = colormap)
 NE3.plot(column = 'predicted', cmap = colormap)
-#predicted_day
+#
+add_point = Point((x,y))
+gdf_am = gpd.GeoSeries([add_point], crs={'init': 'epsg:4326'})
+
+fig, ax = plt.subplots(figsize=(8,8))
+NE3.plot(ax=ax, column = 'predicted', cmap = colormap)
+gdf_am.to_crs({'init': 'epsg:4326'}).plot(ax=ax, markersize = 150, marker = '*')
+
+#ax = NE3.plot(column = 'predicted', cmap = colormap)
+#legend_labels = {'goldenrod':'very early','orange':'early', 'red': 'peak', 'darkred':'late'}
+legend_elements = [Patch(facecolor = 'goldenrod', edgecolor ='w', label = 'very early'),
+                   Patch(facecolor = 'orange', edgecolor ='w', label = 'early'),
+                   Patch(facecolor = 'red', edgecolor ='w', label = 'peak'),
+                   Patch(facecolor = 'darkred', edgecolor ='w', label = 'late'),
+                   Line2D([0],[0], marker = '*',
+                    color ='w', markerfacecolor='cornflowerblue',
+                    label = user_input, markersize=20)]
+ax.legend(handles=legend_elements,
+          bbox_to_anchor=(.25, 1),
+          facecolor="white",
+          frameon = False)
 st.pyplot()
