@@ -223,11 +223,11 @@ st.write(calendar.month_name[start_month], start_day, 2020, 'and', calendar.mont
 
 # ##################################################################
 ## Plot a heatmap
+NE4 = gpd.read_file('NE4.shp')
 
 User_input_day = st.slider('Day of the year', 200, 365, int(prediction))
 st.write(User_input_day, 'is ', calendar.month_name[pd.to_datetime(User_input_day, format = '%j').month], pd.to_datetime(User_input_day, format = '%j').day, '2020')
-NE4 = gpd.read_file('NE4.shp')
-NE4.head()
+#NE4.head()
 
 #create a custom color list that varies based on the user input:
 colors_list = np.repeat('lightgrey', 9, axis = 0)
@@ -248,10 +248,7 @@ for date in dates:
 #color_list = ['darkred','darkred','darkred','red','red','red','orange','orange','lightgrey']
 colormap = []
 colormap = LinearSegmentedColormap.from_list([270, 275, 280, 285, 290, 295, 300, 305, 310],colors_list)
-#colormap
-#NE2.plot(colors, cmap = colormap)
-NE4.plot(column = 'predicted', cmap = colormap)
-#
+
 add_point = Point((x,y))
 gdf_am = gpd.GeoSeries([add_point], crs={'init': 'epsg:4326'})
 
