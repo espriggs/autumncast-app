@@ -149,8 +149,7 @@ def foliage_prediction_2020(x, y):
 st.title('Autumncast')
 
 #st.write('')
-select = st.selectbox('Select a location:', ['Providence, RI',
-'Boston, MA', 'Northhampton, MA', 'Baxter, Maine', 'Burlington, VT', 'Hanover, NH'])
+select = st.selectbox('Select a location:', ['Cambridge, MA', 'Providence, RI', 'Lee, MA', 'Baxter, Maine', 'Burlington, VT', 'Hanover, NH'])
 
 user_input = st.text_input("Or try searching one here:", "")
 if user_input == '':
@@ -270,7 +269,7 @@ legend_elements = [Patch(facecolor = 'goldenrod', edgecolor ='w', label = 'very 
                     color ='w', markerfacecolor='cornflowerblue',
                     label = user_input, markersize=20)]
 ax.legend(handles=legend_elements,
-          bbox_to_anchor=(.25, 1),
+          bbox_to_anchor=(.3, .97),
           facecolor="white",
           frameon = False)
 st.pyplot()
