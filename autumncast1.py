@@ -227,8 +227,8 @@ st.write(calendar.month_name[start_month], start_day, 2020, 'and', calendar.mont
 
 User_input_day = st.slider('Day of the year', 200, 365, int(prediction))
 st.write(User_input_day, 'is ', calendar.month_name[pd.to_datetime(User_input_day, format = '%j').month], pd.to_datetime(User_input_day, format = '%j').day, '2020')
-NE3 = gpd.read_file('NE3.shp')
-NE3.head()
+NE4 = gpd.read_file('NE4.shp')
+NE4.head()
 
 #create a custom color list that varies based on the user input:
 colors_list = np.repeat('lightgrey', 9, axis = 0)
@@ -251,13 +251,13 @@ colormap = []
 colormap = LinearSegmentedColormap.from_list([270, 275, 280, 285, 290, 295, 300, 305, 310],colors_list)
 #colormap
 #NE2.plot(colors, cmap = colormap)
-NE3.plot(column = 'predicted', cmap = colormap)
+NE4.plot(column = 'predicted', cmap = colormap)
 #
 add_point = Point((x,y))
 gdf_am = gpd.GeoSeries([add_point], crs={'init': 'epsg:4326'})
 
 fig, ax = plt.subplots(figsize=(8,8))
-NE3.plot(ax=ax, column = 'predicted', cmap = colormap)
+NE4.plot(ax=ax, column = 'predicted', cmap = colormap)
 gdf_am.to_crs({'init': 'epsg:4326'}).plot(ax=ax, markersize = 150, marker = '*')
 
 #ax = NE3.plot(column = 'predicted', cmap = colormap)
