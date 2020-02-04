@@ -261,10 +261,10 @@ gdf_am.to_crs({'init': 'epsg:4326'}).plot(ax=ax, markersize = 150, marker = '*')
 
 #ax = NE3.plot(column = 'predicted', cmap = colormap)
 #legend_labels = {'goldenrod':'very early','orange':'early', 'red': 'peak', 'darkred':'late'}
-legend_elements = [Patch(facecolor = 'goldenrod', edgecolor ='w', label = 'very early'),
-                   Patch(facecolor = 'orange', edgecolor ='w', label = 'early'),
-                   Patch(facecolor = 'red', edgecolor ='w', label = 'peak'),
-                   Patch(facecolor = 'darkred', edgecolor ='w', label = 'late'),
+legend_elements = [Patch(facecolor = 'goldenrod', edgecolor ='w', label = 'Very early'),
+                   Patch(facecolor = 'orange', edgecolor ='w', label = 'Early'),
+                   Patch(facecolor = 'red', edgecolor ='w', label = 'Peak'),
+                   Patch(facecolor = 'darkred', edgecolor ='w', label = 'Late'),
                    Line2D([0],[0], marker = '*',
                     color ='w', markerfacecolor='cornflowerblue',
                     label = user_input, markersize=20)]
