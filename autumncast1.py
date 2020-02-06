@@ -3,14 +3,13 @@ import numpy as np
 import pandas as pd
 from geopy.geocoders import Nominatim
 import pickle
-from datetime import datetime
+import datetime
 from datetime import date
 import calendar
 import rasterio
 import requests
 import urllib
 import geopandas as gpd
-import shapefile as shp
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.patches import Patch
@@ -146,66 +145,69 @@ def foliage_prediction_2020(x, y):
 # The actual app part
 #######################################################################
 
-st.title('Autumncast')
-
-#st.write('')
-select = st.selectbox('Select a location:', ['Cambridge, MA', 'Providence, RI', 'Lee, MA', 'Baxter, Maine', 'Burlington, VT', 'Hanover, NH'])
-
-user_input = st.text_input("Or try searching one here:", "")
-if user_input == '':
-    user_input = select
-#st.write(user_input)
-
-geolocator = Nominatim(user_agent="my-application")
-try:
-    location = geolocator.geocode(user_input)
-    #print(loc.raw)
-    print('Coordinates: ', location.latitude, location.longitude)
-    #st.write("Found: ", location)
-    x = location.longitude
-    y = location.latitude
-
-except:
-    st.write("Couldn't find this location. Try a different town name?")
-#    location = geolocator.geocode('Burlington, Vermont')
-    y = 44.483752
-    x = -73.208798
-#get the county FIP code for that location:
-
-
-
-#Encode parameters
-params = urllib.parse.urlencode({'latitude': y, 'longitude':x, 'format':'json'})
-#Contruct request URL
-url = 'https://geo.fcc.gov/api/census/block/find?' + params
-
-#Get response from API
-response = requests.get(url)
-
-#Parse json in response
-data = response.json()
-#Get FIPS code, print dominant species
-fips = data['County']['FIPS']
-deciduous_single = pd.read_csv('Single_deciduous_county.csv')
-
-#not all of the counties have FIA plots
-if any(deciduous_single.COUNTYFIP.astype(str).str.contains(fips)):
-    tree = deciduous_single[deciduous_single.COUNTYFIP == int(fips)].Dominant_Species
-    st.write('The dominant deciduous tree species near ',user_input ,' is ', tree.to_string(index = False), '.', sep='')
-
-
+#load in and cache some things that will be necessary later:
+#Read in the model file from a pickle file:
 pkl_filename = 'rf_2020_model.pkl'
 with open(pkl_filename, 'rb') as file:
     pickle_model = pickle.load(file)
 
+NE4 = gpd.read_file('NE4.shp')
+
+
+st.title('Autumncast')
+
+#create some default locations for a dropdown menu:
+select = st.selectbox('Select a location:', ['Cambridge, MA', 'Providence, RI', 'Lee, MA', 'Baxter, Maine', 'Burlington, VT', 'Hanover, NH'])
+city_list = pd.read_csv('backup_city_list.csv', sep='\t')
+#st.write(city_list[city_list.City == select,])
+#st.write(row)
+
+#for these dropdown menu options, provide some lat lons:
+#this is necessary because sometimes geocoder goes down:
+user_input = st.text_input("Or try searching one here:", "")
+if user_input == '':
+    user_input = select
+
+geolocator = Nominatim(user_agent="my-application")
+try:
+    location = geolocator.geocode(user_input)
+    #print('Coordinates: ', location.latitude, location.longitude)
+    x = location.longitude
+    y = location.latitude
+
+except:
+    st.write("Sorry, the feature we use to find locations isn't working right now. Try picking an option from the drop down menu or try again later.")
+    y = 44.483752
+    x = -73.208798
+
+#In order to find the dominant species near the given location,
+#Find the FIP code for the location
+#Encode parameters that are used for the query:
+params = urllib.parse.urlencode({'latitude': y, 'longitude':x, 'format':'json'})
+#Contruct request URL
+url = 'https://geo.fcc.gov/api/census/block/find?' + params
+#Get response from API
+response = requests.get(url)
+#Parse json in response
+data = response.json()
+
+#For that FIPS code, look up the dominant species in the table made from FIA data
+#then print that value for the user (could be extended to show more than one species)
+fips = data['County']['FIPS']
+deciduous_single = pd.read_csv('Single_deciduous_county.csv')
+
+#not all of the counties have FIA plots, for those, do not print a species to the screen
+if any(deciduous_single.COUNTYFIP.astype(str).str.contains(fips)):
+    tree = deciduous_single[deciduous_single.COUNTYFIP == int(fips)].Dominant_Species
+    st.write('The dominant deciduous tree species near ',user_input ,' is ', tree.to_string(index = False), '.', sep='')
+
+#Use the function from above to get the relevant features for the model:
 values = foliage_prediction_2020(x, y)
 
-#st.write(values)
-
+#Convert these values into inputs for the model:
 model_in = [values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[9], '0', '0', '0', '0', '0']
-#st.write(model_in)
 
-#model_in = [366, 284.3, 277.5, 270.2, 302.8, .0002, .0003, 13, 10, '0', '0', '0', '0', '0']
+#add in the species data:
 
 prediction = pickle_model.predict(np.array(model_in).reshape(1,-1))[0]
 start_date = prediction - 7
@@ -218,15 +220,18 @@ end_month = pd.to_datetime(end_date, format = '%j').month
 end_day = pd.to_datetime(end_date, format = '%j').day
 
 st.write('The best fall color in', user_input, ' will be between:')
-st.write(calendar.month_name[start_month], start_day, 2020, 'and', calendar.month_name[end_month], end_day, 2020)
+st.write(calendar.month_name[start_month], str(start_day), str(2020), 'and', calendar.month_name[end_month], str(end_day), str(2020))
 
 
 # ##################################################################
 ## Plot a heatmap
-NE4 = gpd.read_file('NE4.shp')
 
-User_input_day = st.slider('Day of the year', 200, 365, int(prediction))
-st.write(User_input_day, 'is ', calendar.month_name[pd.to_datetime(User_input_day, format = '%j').month], pd.to_datetime(User_input_day, format = '%j').day, '2020')
+prediction_date = pd.to_datetime(prediction, format = '%j')
+prediction_date = prediction_date.replace(year = 2020)
+User_input_day = st.date_input('Change this date to see a map for a different date:', prediction_date)
+User_input_day = User_input_day.timetuple().tm_yday
+#User_input_day = st.slider('Day of the year', 200, 365, int(prediction))
+#st.write(str(User_input_day), 'is ', calendar.month_name[pd.to_datetime(User_input_day, format = '%j').month], str(pd.to_datetime(User_input_day, format = '%j').day), '2020')
 #NE4.head()
 
 #create a custom color list that varies based on the user input:
@@ -258,7 +263,8 @@ gdf_am.to_crs({'init': 'epsg:4326'}).plot(ax=ax, markersize = 150, marker = '*')
 
 #ax = NE3.plot(column = 'predicted', cmap = colormap)
 #legend_labels = {'goldenrod':'very early','orange':'early', 'red': 'peak', 'darkred':'late'}
-legend_elements = [Patch(facecolor = 'goldenrod', edgecolor ='w', label = 'Very early'),
+legend_elements = [Patch(facecolor = 'lightgrey', edgecolor ='w', label = 'No fall color'),
+                    Patch(facecolor = 'goldenrod', edgecolor ='w', label = 'Very early'),
                    Patch(facecolor = 'orange', edgecolor ='w', label = 'Early'),
                    Patch(facecolor = 'red', edgecolor ='w', label = 'Peak'),
                    Patch(facecolor = 'darkred', edgecolor ='w', label = 'Late'),
