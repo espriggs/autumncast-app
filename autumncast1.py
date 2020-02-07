@@ -146,7 +146,6 @@ def foliage_prediction_2020(x, y):
 # The actual app part
 #######################################################################
 
-#load in and cache some things that will be necessary later:
 #Read in the model file from a pickle file:
 pkl_filename = 'rf_2020_model.pkl'
 with open(pkl_filename, 'rb') as file:
