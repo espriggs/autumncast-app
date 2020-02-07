@@ -1,7 +1,16 @@
 # Autumncast-App
 
 Autumncast is a tool for predicting peak fall foliage dates based on climate and weather data. A web version of the app is available at:
-https://secure-stream-96026.herokuapp.com/). This repository contains all of the files necessary to run the web, but data cleaning and modeling notebooks can be found in 
+https://secure-stream-96026.herokuapp.com/). This repository contains all of the files necessary to run the app, but data cleaning and modeling notebooks can be found in the autumncast-modeling (https://github.com/espriggs/autumncast-modeling) repository.
+
+Below is an overview of the steps Autumncast takes to make fall foliage predictions:
+#### 1. Collect a user input location translate the location to latitude and longitude. 
+Autumncast uses geocoder from geopy to query the Nomatim API and retrieve latitude and longitude data. Sometimes this service is unavailable and a few cities in New England are included in "backup_city_list.csv" so that the app will still run in these cases.
+#### 2. For this location look up the dominant deciduous species in that region. 
+Get the county FIP code, use that to look up in a table, "Single_deciduous_county.csv" what the most common deciduous species is. For full details on how this table was created see the data_cleaning.ipynb in autumncast-modeling.
+#### 3. Retrieve daily climate data and calculate the features necessary for the model. 
+#### 4. Run the model.
+#### 5. Plot a heatmap that maches the model.
 
 ## Getting Started
 
