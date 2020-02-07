@@ -179,7 +179,7 @@ else:
         r = re.compile(r'\bRhode\b | \bConnecticut\b | \bMaine\b | \bHampshire\b | \bVermont\b | \bMassachusetts\b', flags=re.I | re.X)
         found = r.findall(str(location))
         if len(found) == 0:
-            st.write("That location wasn't found. Try another place in New England")
+            st.write("That location wasn't found. Try another place in New England.")
             x = 0
             y = 0
     except:
