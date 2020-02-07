@@ -15,19 +15,12 @@ The next step is to use the pre-trained model to make a prediction for the given
 #### 5. Plot a heatmap that maches the model.
 Finally, autumncast plots a heat map that corresponds to the predicted optimal day. The heatmap is composed of townships for each state in New England, each colored based on the estimated peak fall date for the township centroid. 
 
-## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. 
-
+More to do here . . .
 ### Prerequisites
 
-What things you need to install the software and how to install them
-
-```
-Give examples
-```
-
-### Installing
+conda env export --name ENVNAME > envname.yml
+conda env create --file envname.yml
 
 A step by step series of examples that tell you how to get a development env running
 
