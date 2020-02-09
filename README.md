@@ -9,7 +9,7 @@ Autumncast uses geocoder from geopy to query the Nomatim API and retrieve latitu
 #### 2. For the input location, look up the dominant deciduous species in that region. 
 Get the county FIP code, use that to look up what the most common deciduous species is using the table, "Single_deciduous_county.csv". For full details on how this table was created see the data_cleaning.ipynb in autumncast-modeling.
 #### 3. Retrieve daily climate data and calculate the features necessary for the model. 
-Autumncast next retrieves daily 2020 climate data from clipped raster files. These data are from the CMIP5 models using CCSM4 model for the higher emissions scenario. 
+Autumncast next retrieves daily 2020 climate data from clipped raster files. These data are from the World Climate Research Programme's CMIP5 models using CCSM4 model for the higher emissions scenario. See https://www.wcrp-climate.org/wgcm-cmip/wgcm-cmip5 for more details.
 #### 4. Run the model.
 The next step is to use the pre-trained model to make a prediction for the given location.
 #### 5. Plot a heatmap that maches the model.
