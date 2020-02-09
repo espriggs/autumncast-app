@@ -18,25 +18,14 @@ Finally, autumncast plots a heat map that corresponds to the predicted optimal d
 
 More to do here . . .
 ### Prerequisites
+To create a conda environment with all of the necessary packages do:
+conda env create --file autumncast.yml
 
-conda env export --name ENVNAME > envname.yml
-conda env create --file envname.yml
+Activat the environment through:
+conda activate autumncast
 
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
+Then run the app localy using:
+streamlit run autumncast1.py
 
 
 ## Authors
