@@ -153,7 +153,6 @@ with open(pkl_filename, 'rb') as file:
 
 NE4 = gpd.read_file('NE4.shp')
 
-
 st.title('Autumncast')
 
 #create some default locations for a dropdown menu:
