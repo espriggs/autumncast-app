@@ -147,7 +147,7 @@ def foliage_prediction_2020(x, y):
 #######################################################################
 
 #Read in the model file from a pickle file:
-pkl_filename = 'rf_2020_model.pkl'
+pkl_filename = 'rf_2020_model_12_features.pkl'
 with open(pkl_filename, 'rb') as file:
     pickle_model = pickle.load(file)
 
@@ -214,9 +214,11 @@ if y > 0:
     values = foliage_prediction_2020(x, y)
 
     #Convert these values into inputs for the model:
-    model_in = [values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[9], '0', '0', '0', '0', '0']
-
-    #add in the species data:
+    #select only the features in the model (var1, var6, var7, var8, var10)
+    model_in = [values[0], values[5], values[6], values[7], values[9], '0', '0', '0', '0', '0', '0', '0']
+    #create a dictionary to replace the right values according to which species is dominant in that area
+    dict = {' American beech':5, ' flowering dogwood':6, ' northern red oak':7, ' red maple':8, ' sugar maple':9, ' white ash':10, ' white oak':11}
+    model_in[dict[tree.to_string(index = False)]] = "1"
 
     prediction = pickle_model.predict(np.array(model_in).reshape(1,-1))[0]
     start_date = prediction - 7
