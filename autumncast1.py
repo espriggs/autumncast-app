@@ -205,11 +205,14 @@ if y > 0:
     fips = data['County']['FIPS']
     deciduous_single = pd.read_csv('Single_deciduous_county.csv')
 
-    #not all of the counties have FIA plots, for those, do not print a species to the screen
+    #not all of the counties have FIA plots, for those, do not print a species to
+    #the screen but use red maple as the default
     if any(deciduous_single.COUNTYFIP.astype(str).str.contains(fips)):
         tree = deciduous_single[deciduous_single.COUNTYFIP == int(fips)].Dominant_Species
-        st.write('The dominant deciduous tree species near ',user_input ,' is ', tree.to_string(index = False), '.', sep='')
-
+        tree = tree.to_string(index = False)
+        st.write('The dominant deciduous tree species near ',user_input ,' is ', tree, '.', sep='')
+    else:
+        tree = ' red maple'
     #Use the function from above to get the relevant features for the model:
     values = foliage_prediction_2020(x, y)
 
@@ -218,7 +221,7 @@ if y > 0:
     model_in = [values[0], values[5], values[6], values[7], values[9], '0', '0', '0', '0', '0', '0', '0']
     #create a dictionary to replace the right values according to which species is dominant in that area
     dict = {' American beech':5, ' flowering dogwood':6, ' northern red oak':7, ' red maple':8, ' sugar maple':9, ' white ash':10, ' white oak':11}
-    model_in[dict[tree.to_string(index = False)]] = "1"
+    model_in[dict[tree]] = "1"
 
     prediction = pickle_model.predict(np.array(model_in).reshape(1,-1))[0]
     start_date = prediction - 7
